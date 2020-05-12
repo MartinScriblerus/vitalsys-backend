@@ -1,6 +1,69 @@
-version: '2'
+version: '3'
 
 services:
-  app:
+  litbot1:
     image: hylicmerit/litbot
-    ports: - "5000-5010:5000-5010"
+    ports: 
+      - "5000:5000"
+    environment: 
+      - "PORT=5000"
+  litbot2:
+    image: hylicmerit/litbot
+    ports: 
+      - "5001:5001"
+    environment: 
+      - "PORT=5001"
+  litbot3:
+    image: hylicmerit/litbot
+    ports: 
+      - "5002:5002"
+    environment: 
+      - "PORT=5002"
+  litbot4:
+    image: hylicmerit/litbot
+    ports: 
+      - "5003:5003"
+    environment: 
+      - "PORT=5003"
+  litbot5:
+    image: hylicmerit/litbot
+    ports: 
+      - "5004:5004"
+    environment: 
+      - "PORT=5004"
+  litbot6:
+    image: hylicmerit/litbot
+    ports: 
+      - "5005:5005"
+    environment: 
+      - "PORT=5005"
+  litbot7:
+    image: hylicmerit/litbot
+    ports: 
+      - "5006:5006"
+    environment: 
+      - "PORT=5006"
+  litbot8:
+    image: hylicmerit/litbot
+    ports: 
+      - "5007:5007"
+    environment: 
+      - "PORT=5007"
+  litbot9:
+    image: hylicmerit/litbot
+    ports: 
+      - "5008:5008"
+    environment: 
+      - "PORT=5008"
+  litbot10:
+    image: hylicmerit/litbot
+    ports: 
+      - "5009:5009"
+    environment: 
+      - "PORT=5009"
+  litbot11:
+    image: hylicmerit/litbot
+    ports: 
+      - "5010:5010"
+    environment: 
+      - "PORT=5010"
