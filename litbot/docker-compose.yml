@@ -1,0 +1,15 @@
+version: '3'
+services:
+  api:
+    image: sample-express-app
+    build: .
+    networks:
+      - backend
+    ports:
+      - 5000
+    volumes:
+      - ./:/usr/src/app
+
+networks:
+  backend:
+    driver: bridge
