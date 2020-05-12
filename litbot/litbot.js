@@ -5,34 +5,18 @@ const fs = require('fs');
 
 const cors = require('cors');
 const app = express();
-const { log, ExpressAPILogMiddleware } = require('@rama41222/node-logger');
-
-
-const dotenv = require('dotenv');
-dotenv.config();
-console.log(`Your port is 5000`); // 8626
-
-
-const config = {
-  name: 'sample-express-app',
-  port: 5000,
-  host: process.env.DEBUG_HOST,
-};
-
-const logger = log({ console: true, file: false, label: config.name });
+const PORT = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(express.static('public'))
 app.use(express.json());
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", `${process.env.DEBUG_PORT}`); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Origin", `${PORT}`);
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-app.use(ExpressAPILogMiddleware(logger, { request: true }));
 
 const getParadiseLost = () =>{
   try {
@@ -44,25 +28,25 @@ const getParadiseLost = () =>{
 
 
 app.get('/', (req, res) => {
-    let sentencesBeckett = getParadiseLost();
+    let paradiseLostSentences = getParadiseLost();
 
-    beckett = sentencesBeckett.replace(/\\n/g, '');
+    paradiseLost = paradiseLostSentences.replace(/\\n/g, '');
 
-    rita.tokenize(beckett);
-    rita.splitSentences(beckett);
+    rita.tokenize(paradiseLost);
+    rita.splitSentences(paradiseLost);
     let rm = new rita.RiMarkov(5);
-    rm.loadText(beckett);
-    sentencesBeckett = rm.generateSentences(1);
-    console.log(sentencesBeckett);
+    rm.loadText(paradiseLost);
+    paradiseLostSentences = rm.generateSentences(1);
+    console.log(paradiseLostSentences);
     res.send().status(200);
 
 });
 
 
 
-app.listen(config.port, config.host, (e) => {
+app.listen(PORT, (e) => {
   if (e) {
     throw new Error('Internal Server Error');
   }
-  logger.info(`${config.name} running on ${config.host}:${config.port}`);
+  console.log(`Server is running on ${PORT}`);
 });

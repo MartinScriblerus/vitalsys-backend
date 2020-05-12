@@ -1,15 +1,6 @@
-version: '3'
-services:
-  api:
-    image: sample-express-app
-    build: .
-    networks:
-      - backend
-    ports:
-      - 5000
-    volumes:
-      - ./:/usr/src/app
+version: '2'
 
-networks:
-  backend:
-    driver: bridge
+services:
+  app:
+    image: hylicmerit/litbot
+    ports: - "5000-5010:5000-5010"
