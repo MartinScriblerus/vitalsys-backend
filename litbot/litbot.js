@@ -37,8 +37,7 @@ app.get('/', (req, res) => {
     let rm = new rita.RiMarkov(5);
     rm.loadText(paradiseLost);
     paradiseLostSentences = rm.generateSentences(1);
-    console.log(paradiseLostSentences);
-    res.send().status(200);
+    res.send(paradiseLostSentences).status(200);
 
 });
 
