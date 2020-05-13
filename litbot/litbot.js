@@ -18,6 +18,8 @@ app.use(function (req, res, next) {
   next();
 });
 
+let paradiseLostSentences = "";
+
 const getParadiseLost = () =>{
   try {
     return fs.readFileSync('./paradise-lost.txt', 'utf8');
@@ -28,15 +30,6 @@ const getParadiseLost = () =>{
 
 
 app.get('/', (req, res) => {
-    let paradiseLostSentences = getParadiseLost();
-
-    paradiseLost = paradiseLostSentences.replace(/\\n/g, '');
-
-    rita.tokenize(paradiseLost);
-    rita.splitSentences(paradiseLost);
-    let rm = new rita.RiMarkov(5);
-    rm.loadText(paradiseLost);
-    paradiseLostSentences = rm.generateSentences(1);
     res.send(paradiseLostSentences).status(200);
 
 });
@@ -47,5 +40,13 @@ app.listen(PORT, (e) => {
   if (e) {
     throw new Error('Internal Server Error');
   }
-  console.log(`Server is running on ${PORT}`);
+  paradiseLostSentences = getParadiseLost();
+
+  paradiseLost = paradiseLostSentences.replace(/\\n/g, '');
+
+  rita.tokenize(paradiseLost);
+  rita.splitSentences(paradiseLost);
+  let rm = new rita.RiMarkov(3);
+  rm.loadText(paradiseLost);
+  paradiseLostSentences = rm.generateSentences(1);
 });
