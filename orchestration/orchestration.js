@@ -3,7 +3,7 @@ const { exec } = require("child_process");
 const express = require("express");
 const app = express();
 const axios = require("axios").default;
-const port = process.env.ORCHESTRATION_PORT;
+app.set('port', process.env.ORCHESTRATION_PORT || 5555);
 const Sequelize = require("sequelize");
 const MessageModel = require("./models/Message");
 
@@ -78,17 +78,23 @@ const daemonMode = async () => {
     let randBotAmount = Math.floor(Math.random() * 7) + 1;
     //bot messages
     let messages = [];
-    //random bot number
-    let randBotNum = Math.floor(Math.random() * 7) + 1;
-    let prevBot = 0;
+    //no duplicate set of bots to destroy
+    let destroyedBots = [];
     for (let i = 0; i < randBotAmount; i++) {
+        //random bot number
+        let randBotNum = Math.floor(Math.random() * 7) + 1;
         //make sure bots aren't double killed
-        while (randBotNum === prevBot) {
+        while (destroyedBots.includes(randBotNum)) {
             randBotNum = Math.floor(Math.random() * 7) + 1;
         }
+        //get message from bot
         let message = await killBot(`0${randBotNum}`);
+        //persist bot text in db
+        await persistBotText(message);
+        //add message to return list
         messages.push(message);
-        prevBot = randBotNum;
+        //add bot to no duplicate set
+        destroyedBots.push(randBotNum);
     }
     return messages;
 }
@@ -160,8 +166,7 @@ app.get("/messages/:session", async (request, response)=>{
 });
 
 db.sync().then(() => {
-    // eslint-disable-next-line no-console
     console.log('Message db and Message table have been created');
 });
 
-app.listen(port, () => { console.log("Listening on port:" + port) });
+app.listen(app.get('port'), () => { console.log("Listening on port:" + app.get('port')) });
