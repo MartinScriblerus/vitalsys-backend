@@ -1,0 +1,28 @@
+{
+    "development": {
+        "username": "process.env.DBUSER",
+        "password": "process.env.DBPASSWORD",
+        "database":  "process.env.DBNAME",
+        "host":  "process.env.DBHOST",
+        "dialect": "postgres",
+        "operatorsAliases": false
+    },
+    "test": {
+        "username": "process.env.DBUSER",
+        "password": "process.env.DBPASSWORD",
+        "database":  "process.env.DBNAME",
+        "host":  "process.env.DBHOST",
+        "dialect": "postgres",
+        "operatorsAliases": false
+    },
+    "production": {
+        "username": "process.env.DBUSER",
+        "password": "process.env.DBPASSWORD",
+        "database":  "process.env.DBNAME",
+        "host":  "process.env.DBHOST",
+        "dialect": "postgres",
+        "operatorsAliases": false
+    }
+    
+  }
+  

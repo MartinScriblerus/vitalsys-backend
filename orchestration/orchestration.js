@@ -5,6 +5,7 @@ const express = require("express");
 const app = express();
 const axios = require("axios").default;
 const port = process.env.ORCHESTRATION_PORT;
+const db = require('./models/index');
 
 //get bot text
 const getBotText = async (botNum) => {
@@ -15,6 +16,8 @@ const getBotText = async (botNum) => {
         return Promise.resolve("");
     }
 }
+
+
 
 //kill a bot
 const killBot = async (botNum) => {
@@ -46,6 +49,31 @@ app.get("/kill/:botNum", async (request, response) => {
         response.send(message).status(500);
     }
 });
+
+
+
+app.post("/api/paradises", function(req, res) {
+    // req.body hosts is equal to the JSON post sent from the user
+db.Message.create({
+      // idPL: req.body.idPL, 
+      messagePL: req.body.messagePL, 
+      // createdAt : req.body.createdAt,
+      // updatedAt : req.body.updatedAt
+    })
+
+    var newMessage = req.body;
+        newMessage= [{
+        // idPL: req.body.idPL, 
+        messagePL: req.body.messagePL, 
+        // createdAt : req.body.createdAt,
+        // updatedAt : req.body.updatedAt
+        }]
+        console.log(newMessage);
+        messages.push(newMessage);
+        res.json(messages);
+        console.log("this is messages: ", messages)
+  });
+
 
 //kill random number of bots
 const daemonMode = async () => {
