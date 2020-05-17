@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  var User = sequelize.define("User", 
+  var Message = sequelize.define("Message", 
   {
       idPL: {
         type: DataTypes.INTEGER,
@@ -11,12 +11,12 @@ module.exports = function(sequelize, DataTypes) {
         allowNull: false
         },
       createdAt: {
-        type: DataTypes.TIME,
+        type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('NOW()')
         },
       updatedAt: {
-        type: DataTypes.TIME,
+        type: DataTypes.DATE,
         allowNull: false,
         defaultValue: sequelize.literal('NOW()')
         },    
