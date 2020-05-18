@@ -9,19 +9,7 @@ var env       = process.env.NODE_ENV || 'development';
 var db        = {};
 
 // const config = require(`${__dirname}/../sequelize.config.js`)[env]
-const config = require(__dirname + '/../config/config.json')[env];
-
-if (config.use_env_variable) {
-  var sequelize = new Sequelize({
-    database: process.env.DBNAME,
-    host: process.env.DBHOST,
-    username: process.env.DBUSERNAME,
-    password: process.env.DBPASSWORD,
-    dialect: "postgres",
-  });
-} else {
-  sequelize = new Sequelize(config.database, config.host, config.username, config.password, config);
-}
+const config = require('../config/config.json')[env];
 
 sequelize = new Sequelize(config)
 

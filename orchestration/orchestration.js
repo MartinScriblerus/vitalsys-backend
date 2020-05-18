@@ -1,4 +1,3 @@
-
 require("dotenv").config({ path: "./.env" });
 const { exec } = require("child_process");
 const express = require("express");
@@ -38,6 +37,18 @@ const getBotText = async (botNum) => {
     }
 }
 
+//persist bot text
+const persistBotText = async (message) => {
+    //check if message is empty
+    if(message){
+        try {
+            return await Message.create({ messagePL: message });
+        }
+        catch{
+            throw new Exception("Unable to persist message.");
+        }
+    }
+}
 
 
 //kill a bot
@@ -46,55 +57,31 @@ const killBot = async (botNum) => {
     let message = await getBotText(botNum);
     if (message.data) {
         let killResponse = await exec(`docker-compose kill litbot${botNum}`);
-        if(killResponse.stdout){
+        if (killResponse.stdout) {
             return `Litbot0${botNum}'s last words: ${message.data}`;
         }
-        else{
+        else {
             return `Unable to kill Litbot0${botNum}.`;
         }
     }
-    else{
+    else {
         return "";
     }
 }
 
 //endpoint to kill a a bot
-app.get("/kill/:botNum", async (request, response) => {
+app.get("/kill/:botNum", cors(corsOptions), async (request, response) => {
     //get bot number from path variable
     let botNum = request.params.botNum;
     let message = await killBot(botNum);
-    if(!message.indexOf("Unable")){
+    persistBotText(message);
+    if (!message.indexOf("Unable")) {
         response.send(message).status(200);
     }
-    else{
+    else {
         response.send(message).status(500);
     }
 });
-
-
-
-app.post("/api/paradises", function(req, res) {
-    // req.body hosts is equal to the JSON post sent from the user
-db.Message.create({
-      // idPL: req.body.idPL, 
-      messagePL: req.body.messagePL, 
-      // createdAt : req.body.createdAt,
-      // updatedAt : req.body.updatedAt
-    })
-
-    var newMessage = req.body;
-        newMessage= [{
-        // idPL: req.body.idPL, 
-        messagePL: req.body.messagePL, 
-        // createdAt : req.body.createdAt,
-        // updatedAt : req.body.updatedAt
-        }]
-        console.log(newMessage);
-        messages.push(newMessage);
-        res.json(messages);
-        console.log("this is messages: ", messages)
-  });
-
 
 //kill random number of bots
 const daemonMode = async () => {
@@ -102,35 +89,43 @@ const daemonMode = async () => {
     let randBotAmount = Math.floor(Math.random() * 7) + 1;
     //bot messages
     let messages = [];
-    //random bot number
-    let randBotNum = Math.floor(Math.random() * 7) + 1;
-    let prevBot = 0;
-    for(let i = 0; i < randBotAmount; i++){
+    //no duplicate set of bots to destroy
+    let destroyedBots = [];
+    for (let i = 0; i < randBotAmount; i++) {
+        //random bot number
+        let randBotNum = Math.floor(Math.random() * 7) + 1;
         //make sure bots aren't double killed
-        while(randBotNum === prevBot){
+        while (destroyedBots.includes(randBotNum)) {
             randBotNum = Math.floor(Math.random() * 7) + 1;
         }
+        //get message from bot
         let message = await killBot(`0${randBotNum}`);
+        //persist bot text in db
+        await persistBotText(message);
+        //add message to return list
         messages.push(message);
-        prevBot = randBotNum;
+        //add bot to no duplicate set
+        destroyedBots.push(randBotNum);
     }
     return messages;
 }
 
 //endpoint for killing random bots
-app.get("/daemon", async (request, response) => {
+app.get("/daemon", cors(corsOptions), async (request, response) => {
     let messages = await daemonMode();
     response.send(messages).status(200);
 });
 
 //heal bot if it's down
 const healBot = async (botNum) => {
+    healing = true;
     try {
         return await exec(`docker-compose start litbot0${botNum}`, (error) => {
             if (error) {
                 return `Unable to run command to start: Litbot0${botNum}`;
             }
             else {
+                healing = false;
                 return `Successfully started: Litbot0${botNum}`;
             }
         });
@@ -141,14 +136,14 @@ const healBot = async (botNum) => {
 }
 
 //health check for the bot cluster
-app.get("/health", async (request, response) => {
+app.get("/health", cors(corsOptions), async (request, response) => {
     try {
         let health = [];
         for (let i = 1; i <= 7; i++) {
             let botHealth = await getBotText(`0${i}`);
             health.push(botHealth.data ? true : false);
             //if bot is dead send orchestration request to heal it
-            if (!botHealth.data) {
+            if (!botHealth.data && !healing) {
                 //try to heal bot
                 let healResponse = await healBot(i);
                 //if unable to heal bot send server side error status
