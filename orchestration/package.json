@@ -1,0 +1,19 @@
+{
+  "name": "orchestration",
+  "version": "1.0.0",
+  "description": "Simple orchestration service to start/stop docker containers",
+  "main": "orchestration.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "pg": "^8.2.1",
+    "sequelize": "^5.21.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "M. Milagro Quintero",
+  "license": "ISC"
+}
