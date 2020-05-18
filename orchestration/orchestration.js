@@ -8,9 +8,15 @@ const Sequelize = require("sequelize");
 const MessageModel = require("./models/Message");
 const cors = require("cors");
 
-const corsOptions = {
-    origin: 'http://vital-sys.s3-website.us-east-2.amazonaws.com/'
-  }
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", process.env.FRONT_END); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", '*');
+    next();
+  });
+app.options("*", cors())
+
+
+
 
 let healing = false;
 
@@ -151,7 +157,7 @@ app.get("/health", cors(corsOptions), async (request, response) => {
     }
 });
 
-app.get("/messages/:session", cors(corsOptions), async (request, response)=>{
+app.get("/messages/:session", async (request, response)=>{
     try{
         const session = request.params.session;
         const messages = await Message.findAll({
