@@ -6,6 +6,11 @@ const axios = require("axios").default;
 app.set('port', process.env.ORCHESTRATION_PORT || 5555);
 const Sequelize = require("sequelize");
 const MessageModel = require("./models/Message");
+const cors = require("cors");
+
+const corsOptions = {
+    origin: 'http://vital-sys.s3-website.us-east-2.amazonaws.com/'
+  }
 
 let healing = false;
 
@@ -59,7 +64,7 @@ const killBot = async (botNum) => {
 }
 
 //endpoint to kill a a bot
-app.get("/kill/:botNum", async (request, response) => {
+app.get("/kill/:botNum", cors(corsOptions), async (request, response) => {
     //get bot number from path variable
     let botNum = request.params.botNum;
     let message = await killBot(botNum);
@@ -100,7 +105,7 @@ const daemonMode = async () => {
 }
 
 //endpoint for killing random bots
-app.get("/daemon", async (request, response) => {
+app.get("/daemon", cors(corsOptions), async (request, response) => {
     let messages = await daemonMode();
     response.send(messages).status(200);
 });
@@ -125,7 +130,7 @@ const healBot = async (botNum) => {
 }
 
 //health check for the bot cluster
-app.get("/health", async (request, response) => {
+app.get("/health", cors(corsOptions), async (request, response) => {
     try {
         let health = [];
         for (let i = 1; i <= 7; i++) {
@@ -146,7 +151,7 @@ app.get("/health", async (request, response) => {
     }
 });
 
-app.get("/messages/:session", async (request, response)=>{
+app.get("/messages/:session", cors(corsOptions), async (request, response)=>{
     try{
         const session = request.params.session;
         const messages = await Message.findAll({
