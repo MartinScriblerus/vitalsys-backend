@@ -4,8 +4,29 @@ const { exec } = require("child_process");
 const express = require("express");
 const app = express();
 const axios = require("axios").default;
-const port = process.env.ORCHESTRATION_PORT;
-const db = require('./models/index');
+app.set('port', process.env.ORCHESTRATION_PORT || 5555);
+const Sequelize = require("sequelize");
+const MessageModel = require("./models/Message");
+const cors = require("cors");
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", process.env.FRONT_END); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", '*');
+    next();
+  });
+app.options("*", cors())
+
+
+
+
+let healing = false;
+
+const db = new Sequelize(process.env.DBNAME, process.env.DBUSERNAME, process.env.DBPASSWORD, {
+    host: process.env.DBHOST,
+    dialect: 'postgres',
+});
+
+const Message = MessageModel(db, Sequelize);
 
 //get bot text
 const getBotText = async (botNum) => {
@@ -141,4 +162,27 @@ app.get("/health", async (request, response) => {
     }
 });
 
-app.listen(port, () => { console.log("Listening on port:" + port) });
+app.get("/messages/:session", async (request, response)=>{
+    try{
+        const session = request.params.session;
+        const messages = await Message.findAll({
+            attributes:["messagePL"],
+            where:{
+                createdAt:{
+                    [Sequelize.Op.gt]: new Date(session)
+                }
+            }
+        });
+        const formattedMessages = messages.map((item)=>{return new String(item.messagePL)});
+        response.send(formattedMessages).status(200);
+    }
+    catch{
+        response.send("Couldn't retrieve messages from the database.").status(500);
+    }
+});
+
+db.sync().then(() => {
+    console.log('Message db and Message table have been created');
+});
+
+app.listen(app.get('port'), () => { console.log("Listening on port:" + app.get('port')) });
